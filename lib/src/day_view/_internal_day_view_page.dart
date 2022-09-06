@@ -70,7 +70,7 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
   /// Called when user long press on calendar.
   final DatePressCallback? onDateLongPress;
 
-  /// Called when user taps on calendar.
+  /// Called when user press on calendar.
   final DateTapCallback? onDateTap;
 
   /// Defines size of the slots that provides long press callback on area

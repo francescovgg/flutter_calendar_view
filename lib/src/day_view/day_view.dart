@@ -141,7 +141,7 @@ class DayView<T extends Object?> extends StatefulWidget {
   /// This method will be called when user long press on calendar.
   final DatePressCallback? onDateLongPress;
 
-  /// This method will be called when user taps on calendar.
+  /// This method will be called when user press on calendar.
   final DateTapCallback? onDateTap;
 
   /// Defines size of the slots that provides long press callback on area
