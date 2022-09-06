@@ -124,14 +124,20 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
               showVerticalLine: showVerticalLine,
             ),
           ),
-          PressDetector(
-            width: width,
-            height: height,
-            heightPerMinute: heightPerMinute,
-            date: date,
-            onDateTap: onDateTap,
-            onDateLongPress: onDateLongPress,
-            minuteSlotSize: minuteSlotSize,
+          Align(
+            alignment: Alignment.centerRight,
+            child: PressDetector(
+              width: width -
+                  timeLineWidth -
+                  verticalLineOffset -
+                  hourIndicatorSettings.offset,
+              height: height,
+              heightPerMinute: heightPerMinute,
+              date: date,
+              onDateTap: onDateTap,
+              onDateLongPress: onDateLongPress,
+              minuteSlotSize: minuteSlotSize,
+            ),
           ),
           Align(
             alignment: Alignment.centerRight,
