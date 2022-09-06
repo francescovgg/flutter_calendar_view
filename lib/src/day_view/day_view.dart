@@ -148,6 +148,9 @@ class DayView<T extends Object?> extends StatefulWidget {
   /// where events are not there.
   final MinuteSlotSize minuteSlotSize;
 
+  /// Defines number of columns in day/week view page.
+  final int columns;
+
   /// Main widget for day view.
   const DayView({
     Key? key,
@@ -179,6 +182,7 @@ class DayView<T extends Object?> extends StatefulWidget {
     this.onDateLongPress,
     this.onDateTap,
     this.minuteSlotSize = MinuteSlotSize.minutes60,
+    this.columns = 1,
   })  : assert(timeLineOffset >= 0,
             "timeLineOffset must be greater than or equal to 0"),
         assert(width == null || width > 0,
@@ -362,6 +366,7 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
                                   eventArranger: _eventArranger,
                                   minuteSlotSize: widget.minuteSlotSize,
                                   scrollNotifier: _scrollConfiguration,
+                                  columns: widget.columns,
                                 ));
                       },
                     ),

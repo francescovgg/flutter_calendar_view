@@ -94,6 +94,9 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
   /// where events are not there.
   final MinuteSlotSize minuteSlotSize;
 
+  /// Defines number of columns in day/week view page.
+  final int columns;
+
   final EventScrollConfiguration scrollConfiguration;
 
   /// A single page for week view.
@@ -125,6 +128,7 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
     required this.weekDays,
     required this.minuteSlotSize,
     required this.scrollConfiguration,
+    required this.columns,
   }) : super(key: key);
 
   @override
@@ -215,6 +219,7 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
                                       onDateTap: onDateTap,
                                       onDateLongPress: onDateLongPress,
                                       minuteSlotSize: minuteSlotSize,
+                                      columns: columns,
                                     ),
                                     EventGenerator<T>(
                                       height: height,

@@ -80,6 +80,9 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
   /// Notifies if there is any event that needs to be visible instantly.
   final EventScrollConfiguration scrollNotifier;
 
+  /// Defines number of columns in day/week view page.
+  final int columns;
+
   /// Defines a single day page.
   const InternalDayViewPage({
     Key? key,
@@ -104,6 +107,7 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
     required this.onDateTap,
     required this.minuteSlotSize,
     required this.scrollNotifier,
+    required this.columns,
   }) : super(key: key);
 
   @override
@@ -133,6 +137,7 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
                   hourIndicatorSettings.offset,
               height: height,
               heightPerMinute: heightPerMinute,
+              columns: columns,
               date: date,
               onDateTap: onDateTap,
               onDateLongPress: onDateLongPress,

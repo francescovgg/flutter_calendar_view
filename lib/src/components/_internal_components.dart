@@ -289,6 +289,9 @@ class PressDetector extends StatelessWidget {
   /// Defines height of single minute in day/week view page.
   final double heightPerMinute;
 
+  /// Defines number of columns in day/week view page.
+  final int columns;
+
   /// Defines date for which events will be displayed in given display area.
   final DateTime date;
 
@@ -312,12 +315,14 @@ class PressDetector extends StatelessWidget {
     required this.onDateLongPress,
     required this.onDateTap,
     required this.minuteSlotSize,
+    required this.columns,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final heightPerSlot = minuteSlotSize.minutes * heightPerMinute;
     final slots = (Constants.hoursADay * 60) ~/ minuteSlotSize.minutes;
+    final columnSize = width / columns;
 
     return Container(
       height: height,
@@ -325,15 +330,26 @@ class PressDetector extends StatelessWidget {
       child: Stack(
         children: [
           for (int i = 0; i < slots; i++)
-            Positioned(
-              top: heightPerSlot * i,
-              left: 0,
-              right: 0,
-              bottom: height - (heightPerSlot * (i + 1)),
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  onDateTap?.call(
+            for (int col = 0; col < columns; col++)
+              Positioned(
+                top: heightPerSlot * i,
+                left: col * columnSize,
+                width: columnSize,
+                bottom: height - (heightPerSlot * (i + 1)),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    onDateTap?.call(
+                        DateTime(
+                          date.year,
+                          date.month,
+                          date.day,
+                          0,
+                          minuteSlotSize.minutes * i,
+                        ),
+                        col);
+                  },
+                  onLongPress: () => onDateLongPress?.call(
                     DateTime(
                       date.year,
                       date.month,
@@ -341,20 +357,21 @@ class PressDetector extends StatelessWidget {
                       0,
                       minuteSlotSize.minutes * i,
                     ),
-                  );
-                },
-                onLongPress: () => onDateLongPress?.call(
-                  DateTime(
-                    date.year,
-                    date.month,
-                    date.day,
-                    0,
-                    minuteSlotSize.minutes * i,
+                  ),
+                  child: Container(
+                    width: width,
+                    height: heightPerSlot,
+                    child: col < (columns - 1)? Align(
+                      alignment: Alignment.centerRight,
+                      child: VerticalDivider(
+                        color: Colors.deepPurple.withOpacity(0.3),
+                        thickness: 1,
+                      ),
+                    ) : null,
+                    //color: i.isEven? Colors.white: Colors.grey.withOpacity(0.4),
                   ),
                 ),
-                child: SizedBox(width: width, height: heightPerSlot),
               ),
-            ),
         ],
       ),
     );
