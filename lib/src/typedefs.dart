@@ -29,6 +29,9 @@ typedef DateWidgetBuilder = Widget Function(
   DateTime date,
 );
 
+typedef PressDetectorCellBuilder = Widget Function(
+    double width, double height, int row, int col);
+
 typedef CalendarPageChangeCallBack = void Function(DateTime date, int page);
 
 typedef PageChangeCallback = void Function(

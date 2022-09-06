@@ -144,6 +144,9 @@ class WeekView<T extends Object?> extends StatefulWidget {
   /// Defines number of columns in day/week view page.
   final int columns;
 
+  /// Defines a builder function for a cell slot
+  final PressDetectorCellBuilder? cellBuilder;
+
   /// Main widget for week view.
   const WeekView({
     Key? key,
@@ -177,6 +180,7 @@ class WeekView<T extends Object?> extends StatefulWidget {
     this.startDay = WeekDays.monday,
     this.minuteSlotSize = MinuteSlotSize.minutes60,
     this.columns = 1,
+    this.cellBuilder,
   })  : assert((timeLineOffset) >= 0,
             "timeLineOffset must be greater than or equal to 0"),
         assert(width == null || width > 0,
@@ -376,6 +380,7 @@ class WeekViewState<T extends Object?> extends State<WeekView<T>> {
                                 minuteSlotSize: widget.minuteSlotSize,
                                 scrollConfiguration: _scrollConfiguration,
                                 columns: widget.columns,
+                                cellBuilder: widget.cellBuilder,
                               ));
                     },
                   ),

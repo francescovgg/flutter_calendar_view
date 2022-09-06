@@ -305,18 +305,22 @@ class PressDetector extends StatelessWidget {
   /// where events are not available.
   final MinuteSlotSize minuteSlotSize;
 
+  /// Defines a builder function for a cell slot
+  final PressDetectorCellBuilder? cellBuilder;
+
   /// A widget that display event tiles in day/week view.
-  const PressDetector({
-    Key? key,
-    required this.height,
-    required this.width,
-    required this.heightPerMinute,
-    required this.date,
-    required this.onDateLongPress,
-    required this.onDateTap,
-    required this.minuteSlotSize,
-    required this.columns,
-  }) : super(key: key);
+  const PressDetector(
+      {Key? key,
+      required this.height,
+      required this.width,
+      required this.heightPerMinute,
+      required this.date,
+      required this.onDateLongPress,
+      required this.onDateTap,
+      required this.minuteSlotSize,
+      required this.columns,
+      required this.cellBuilder})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -329,48 +333,40 @@ class PressDetector extends StatelessWidget {
       width: width,
       child: Stack(
         children: [
-          for (int i = 0; i < slots; i++)
+          for (int row = 0; row < slots; row++)
             for (int col = 0; col < columns; col++)
               Positioned(
-                top: heightPerSlot * i,
+                top: heightPerSlot * row,
                 left: col * columnSize,
                 width: columnSize,
-                bottom: height - (heightPerSlot * (i + 1)),
+                bottom: height - (heightPerSlot * (row + 1)),
                 child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {
-                    onDateTap?.call(
-                        DateTime(
-                          date.year,
-                          date.month,
-                          date.day,
-                          0,
-                          minuteSlotSize.minutes * i,
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () {
+                      onDateTap?.call(
+                          DateTime(
+                            date.year,
+                            date.month,
+                            date.day,
+                            0,
+                            minuteSlotSize.minutes * row,
+                          ),
+                          col);
+                    },
+                    onLongPress: () => onDateLongPress?.call(
+                          DateTime(
+                            date.year,
+                            date.month,
+                            date.day,
+                            0,
+                            minuteSlotSize.minutes * row,
+                          ),
                         ),
-                        col);
-                  },
-                  onLongPress: () => onDateLongPress?.call(
-                    DateTime(
-                      date.year,
-                      date.month,
-                      date.day,
-                      0,
-                      minuteSlotSize.minutes * i,
-                    ),
-                  ),
-                  child: Container(
-                    width: width,
-                    height: heightPerSlot,
-                    child: col < (columns - 1)? Align(
-                      alignment: Alignment.centerRight,
-                      child: VerticalDivider(
-                        color: Colors.deepPurple.withOpacity(0.3),
-                        thickness: 1,
-                      ),
-                    ) : null,
-                    //color: i.isEven? Colors.white: Colors.grey.withOpacity(0.4),
-                  ),
-                ),
+                    child: cellBuilder?.call(width, height, row, col) ??
+                        SizedBox(
+                          width: width,
+                          height: heightPerSlot,
+                        )),
               ),
         ],
       ),

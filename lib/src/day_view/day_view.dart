@@ -151,6 +151,9 @@ class DayView<T extends Object?> extends StatefulWidget {
   /// Defines number of columns in day/week view page.
   final int columns;
 
+  /// Defines a builder function for a cell slot
+  final PressDetectorCellBuilder? cellBuilder;
+
   /// Main widget for day view.
   const DayView({
     Key? key,
@@ -183,6 +186,7 @@ class DayView<T extends Object?> extends StatefulWidget {
     this.onDateTap,
     this.minuteSlotSize = MinuteSlotSize.minutes60,
     this.columns = 1,
+    this.cellBuilder,
   })  : assert(timeLineOffset >= 0,
             "timeLineOffset must be greater than or equal to 0"),
         assert(width == null || width > 0,
@@ -353,6 +357,7 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
                                   onTileTap: widget.onEventTap,
                                   onDateLongPress: widget.onDateLongPress,
                                   onDateTap: widget.onDateTap,
+                                  cellBuilder: widget.cellBuilder,
                                   showLiveLine: widget
                                           .showLiveTimeLineInAllDays ||
                                       date.compareWithoutTime(DateTime.now()),

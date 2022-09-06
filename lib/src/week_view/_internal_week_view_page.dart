@@ -99,6 +99,9 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
 
   final EventScrollConfiguration scrollConfiguration;
 
+  /// Defines a builder function for a cell slot
+  final PressDetectorCellBuilder? cellBuilder;
+
   /// A single page for week view.
   const InternalWeekViewPage({
     Key? key,
@@ -129,6 +132,7 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
     required this.minuteSlotSize,
     required this.scrollConfiguration,
     required this.columns,
+    required this.cellBuilder,
   }) : super(key: key);
 
   @override
@@ -220,6 +224,7 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
                                       onDateLongPress: onDateLongPress,
                                       minuteSlotSize: minuteSlotSize,
                                       columns: columns,
+                                      cellBuilder: cellBuilder,
                                     ),
                                     EventGenerator<T>(
                                       height: height,

@@ -83,6 +83,9 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
   /// Defines number of columns in day/week view page.
   final int columns;
 
+  /// Defines a builder function for a cell slot
+  final PressDetectorCellBuilder? cellBuilder;
+
   /// Defines a single day page.
   const InternalDayViewPage({
     Key? key,
@@ -108,6 +111,7 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
     required this.minuteSlotSize,
     required this.scrollNotifier,
     required this.columns,
+    required this.cellBuilder,
   }) : super(key: key);
 
   @override
@@ -142,6 +146,7 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
               onDateTap: onDateTap,
               onDateLongPress: onDateLongPress,
               minuteSlotSize: minuteSlotSize,
+              cellBuilder: cellBuilder,
             ),
           ),
           Align(
