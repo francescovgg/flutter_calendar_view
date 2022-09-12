@@ -575,7 +575,7 @@ class _MonthPageBuilder<T> extends StatelessWidget {
         itemBuilder: (context, index) {
           final events = controller.getEventsOnDay(monthDays[index]);
           return GestureDetector(
-            onTap: () => onCellTap?.call(events, monthDays[index]),
+            onTap: () => onCellTap?.call(events, monthDays[index], 0,0, width, height),
             onLongPress: () => onDateLongPress?.call(monthDays[index]),
             child: Container(
               decoration: BoxDecoration(

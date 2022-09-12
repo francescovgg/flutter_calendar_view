@@ -7,27 +7,27 @@ import 'package:flutter/material.dart';
 import 'calendar_event_data.dart';
 
 typedef CellBuilder<T extends Object?> = Widget Function(
-  DateTime date,
-  List<CalendarEventData<T>> event,
-  bool isToday,
-  bool isInMonth,
-);
+    DateTime date,
+    List<CalendarEventData<T>> event,
+    bool isToday,
+    bool isInMonth,
+    );
 
 typedef EventTileBuilder<T extends Object?> = Widget Function(
-  DateTime date,
-  List<CalendarEventData<T>> events,
-  Rect boundary,
-  DateTime startDuration,
-  DateTime endDuration,
-);
+    DateTime date,
+    List<CalendarEventData<T>> events,
+    Rect boundary,
+    DateTime startDuration,
+    DateTime endDuration,
+    );
 
 typedef WeekDayBuilder = Widget Function(
-  int day,
-);
+    int day,
+    );
 
 typedef DateWidgetBuilder = Widget Function(
-  DateTime date,
-);
+    DateTime date,
+    );
 
 typedef PressDetectorCellBuilder = Widget Function(
     double width, double height, int row, int col);
@@ -35,9 +35,9 @@ typedef PressDetectorCellBuilder = Widget Function(
 typedef CalendarPageChangeCallBack = void Function(DateTime date, int page);
 
 typedef PageChangeCallback = void Function(
-  DateTime date,
-  CalendarEventData event,
-);
+    DateTime date,
+    CalendarEventData event,
+    );
 
 typedef StringProvider = String Function(DateTime date,
     {DateTime? secondaryDate});
@@ -49,11 +49,13 @@ typedef TileTapCallback<T extends Object?> = void Function(
     CalendarEventData<T> event, DateTime date);
 
 typedef CellTapCallback<T extends Object?> = void Function(
-    List<CalendarEventData<T>> events, DateTime date);
+    List<CalendarEventData<T>> events, DateTime date,
+    double top, double left, double width, double height);
 
 typedef DatePressCallback = void Function(DateTime date);
 
-typedef DateTapCallback = void Function(DateTime date, int column);
+typedef DateTapCallback = void Function(DateTime date, int column,
+    double top, double left, double width, double height);
 
 typedef EventFilter<T extends Object?> = List<CalendarEventData<T>> Function(
     DateTime date, List<CalendarEventData<T>> events);

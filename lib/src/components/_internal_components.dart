@@ -36,13 +36,12 @@ class LiveTimeIndicator extends StatefulWidget {
   final double heightPerMinute;
 
   /// Widget to display tile line according to current time.
-  const LiveTimeIndicator(
-      {Key? key,
-      required this.width,
-      required this.height,
-      required this.timeLineWidth,
-      required this.liveTimeIndicatorSettings,
-      required this.heightPerMinute})
+  const LiveTimeIndicator({Key? key,
+    required this.width,
+    required this.height,
+    required this.timeLineWidth,
+    required this.liveTimeIndicatorSettings,
+    required this.heightPerMinute})
       : super(key: key);
 
   @override
@@ -115,13 +114,12 @@ class TimeLine extends StatelessWidget {
   static DateTime get _date => DateTime.now();
 
   /// Time line to display time at left side of day or week view.
-  const TimeLine(
-      {Key? key,
-      required this.timeLineWidth,
-      required this.hourHeight,
-      required this.height,
-      required this.timeLineOffset,
-      required this.timeLineBuilder})
+  const TimeLine({Key? key,
+    required this.timeLineWidth,
+    required this.hourHeight,
+    required this.height,
+    required this.timeLineOffset,
+    required this.timeLineBuilder})
       : super(key: key);
 
   @override
@@ -221,7 +219,17 @@ class EventGenerator<T extends Object?> extends StatelessWidget {
         left: events[index].left,
         right: events[index].right,
         child: GestureDetector(
-          onTap: () => onTileTap?.call(events[index].events, date),
+          onTap: () {
+            final renderBox = context
+                .findRenderObject() as RenderBox?;
+            final offset = renderBox!.localToGlobal(Offset.zero);
+            onTileTap?.call(events[index].events, date,
+              (events[index].top + offset.dy) %
+              (renderBox.size.height + offset.dy),
+              events[index].left + 71,
+              width,
+              height);
+            },
           child: Builder(builder: (context) {
             if (scrollNotifier.shouldScroll &&
                 events[index]
@@ -309,18 +317,18 @@ class PressDetector extends StatelessWidget {
   final PressDetectorCellBuilder? cellBuilder;
 
   /// A widget that display event tiles in day/week view.
-  const PressDetector(
-      {Key? key,
-      required this.height,
-      required this.width,
-      required this.heightPerMinute,
-      required this.date,
-      required this.onDateLongPress,
-      required this.onDateTap,
-      required this.minuteSlotSize,
-      required this.columns,
-      required this.cellBuilder})
+  const PressDetector({Key? key,
+    required this.height,
+    required this.width,
+    required this.heightPerMinute,
+    required this.date,
+    required this.onDateLongPress,
+    required this.onDateTap,
+    required this.minuteSlotSize,
+    required this.columns,
+    required this.cellBuilder})
       : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
@@ -343,6 +351,9 @@ class PressDetector extends StatelessWidget {
                 child: GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () {
+                      final renderBox = context
+                          .findRenderObject() as RenderBox?;
+                      final offset = renderBox!.localToGlobal(Offset.zero);
                       onDateTap?.call(
                           DateTime(
                             date.year,
@@ -351,9 +362,21 @@ class PressDetector extends StatelessWidget {
                             0,
                             minuteSlotSize.minutes * row,
                           ),
-                          col);
+                          col,
+                          ((heightPerSlot * row) + offset.dy) %
+                              (renderBox.size.height + offset.dy), // top
+                          col * columnSize + 71, // left
+                          columnSize, // width
+                          heightPerSlot // height
+                      );
+                      /*_showOverlay(
+                          context,
+                          heightPerSlot * row,
+                          col * columnSize,
+                          width: columnSize);*/
                     },
-                    onLongPress: () => onDateLongPress?.call(
+                    onLongPress: () =>
+                        onDateLongPress?.call(
                           DateTime(
                             date.year,
                             date.month,
@@ -362,7 +385,7 @@ class PressDetector extends StatelessWidget {
                             minuteSlotSize.minutes * row,
                           ),
                         ),
-                    child: cellBuilder?.call(width, height, row, col) ??
+                    child: cellBuilder?.call(columnSize, height, row, col) ??
                         SizedBox(
                           width: width,
                           height: heightPerSlot,
