@@ -36,12 +36,13 @@ class LiveTimeIndicator extends StatefulWidget {
   final double heightPerMinute;
 
   /// Widget to display tile line according to current time.
-  const LiveTimeIndicator({Key? key,
-    required this.width,
-    required this.height,
-    required this.timeLineWidth,
-    required this.liveTimeIndicatorSettings,
-    required this.heightPerMinute})
+  const LiveTimeIndicator(
+      {Key? key,
+      required this.width,
+      required this.height,
+      required this.timeLineWidth,
+      required this.liveTimeIndicatorSettings,
+      required this.heightPerMinute})
       : super(key: key);
 
   @override
@@ -114,12 +115,13 @@ class TimeLine extends StatelessWidget {
   static DateTime get _date => DateTime.now();
 
   /// Time line to display time at left side of day or week view.
-  const TimeLine({Key? key,
-    required this.timeLineWidth,
-    required this.hourHeight,
-    required this.height,
-    required this.timeLineOffset,
-    required this.timeLineBuilder})
+  const TimeLine(
+      {Key? key,
+      required this.timeLineWidth,
+      required this.hourHeight,
+      required this.height,
+      required this.timeLineOffset,
+      required this.timeLineBuilder})
       : super(key: key);
 
   @override
@@ -204,7 +206,7 @@ class EventGenerator<T extends Object?> extends StatelessWidget {
   /// Arrange events and returns list of [Widget] that displays event
   /// tile on display area. This method uses [eventArranger] to get position
   /// of events and [eventTileBuilder] to display events.
-  List<Widget> _generateEvents(BuildContext context) {
+  List<Widget> _generateEvents(BuildContext context, layerLinks) {
     final events = eventArranger.arrange(
       events: this.events,
       height: height,
@@ -218,37 +220,35 @@ class EventGenerator<T extends Object?> extends StatelessWidget {
         bottom: events[index].bottom,
         left: events[index].left,
         right: events[index].right,
-        child: GestureDetector(
-          onTap: () {
-            final renderBox = context
-                .findRenderObject() as RenderBox?;
-            final offset = renderBox!.localToGlobal(Offset.zero);
-            onTileTap?.call(events[index].events, date,
-              (events[index].top + offset.dy) %
-              (renderBox.size.height + offset.dy),
-              events[index].left + 71,
-              width,
-              height);
-            },
-          child: Builder(builder: (context) {
-            if (scrollNotifier.shouldScroll &&
-                events[index]
-                    .events
-                    .any((element) => element == scrollNotifier.event)) {
-              _scrollToEvent(context);
-            }
-            return eventTileBuilder(
-              date,
-              events[index].events,
-              Rect.fromLTWH(
-                  events[index].left,
-                  events[index].top,
+        child: CompositedTransformTarget(
+          link: layerLinks[index],
+          child: GestureDetector(
+            onTap: () {
+              final renderBox = context.findRenderObject() as RenderBox?;
+              final offset = renderBox!.localToGlobal(Offset.zero);
+              onTileTap?.call(
+                  events[index].events,
+                  date,
+                  (events[index].top + offset.dy) % (renderBox.size.height + offset.dy),
+                  events[index].left + 71,
                   width - events[index].right - events[index].left,
-                  height - events[index].bottom - events[index].top),
-              events[index].startDuration ?? DateTime.now(),
-              events[index].endDuration ?? DateTime.now(),
-            );
-          }),
+                  height - events[index].bottom - events[index].top,
+                  layerLinks[index]);
+            },
+            child: Builder(builder: (context) {
+              if (scrollNotifier.shouldScroll && events[index].events.any((element) => element == scrollNotifier.event)) {
+                _scrollToEvent(context);
+              }
+              return eventTileBuilder(
+                date,
+                events[index].events,
+                Rect.fromLTWH(events[index].left, events[index].top, width - events[index].right - events[index].left,
+                    height - events[index].bottom - events[index].top),
+                events[index].startDuration ?? DateTime.now(),
+                events[index].endDuration ?? DateTime.now(),
+              );
+            }),
+          ),
         ),
       );
     });
@@ -276,17 +276,24 @@ class EventGenerator<T extends Object?> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<LayerLink> layerLinks = List.generate(eventArranger.arrange(
+      events: this.events,
+      height: height,
+      width: width,
+      heightPerMinute: heightPerMinute,
+    ).length, (index) => LayerLink());
+
     return Container(
       height: height,
       width: width,
       child: Stack(
-        children: _generateEvents(context),
+        children: _generateEvents(context, layerLinks),
       ),
     );
   }
 }
 
-/// A widget that allow to long press on calendar.
+/// A widget that allow to press on calendar.
 class PressDetector extends StatelessWidget {
   /// Height of display area
   final double height;
@@ -317,24 +324,26 @@ class PressDetector extends StatelessWidget {
   final PressDetectorCellBuilder? cellBuilder;
 
   /// A widget that display event tiles in day/week view.
-  const PressDetector({Key? key,
-    required this.height,
-    required this.width,
-    required this.heightPerMinute,
-    required this.date,
-    required this.onDateLongPress,
-    required this.onDateTap,
-    required this.minuteSlotSize,
-    required this.columns,
-    required this.cellBuilder})
+  const PressDetector(
+      {Key? key,
+      required this.height,
+      required this.width,
+      required this.heightPerMinute,
+      required this.date,
+      required this.onDateLongPress,
+      required this.onDateTap,
+      required this.minuteSlotSize,
+      required this.columns,
+      required this.cellBuilder})
       : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
     final heightPerSlot = minuteSlotSize.minutes * heightPerMinute;
     final slots = (Constants.hoursADay * 60) ~/ minuteSlotSize.minutes;
     final columnSize = width / columns;
+    final _layersLinks =
+        List<List<LayerLink>>.generate(slots, (index) => List.generate(columns, (index) => LayerLink()));
 
     return Container(
       height: height,
@@ -348,48 +357,49 @@ class PressDetector extends StatelessWidget {
                 left: col * columnSize,
                 width: columnSize,
                 bottom: height - (heightPerSlot * (row + 1)),
-                child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      final renderBox = context
-                          .findRenderObject() as RenderBox?;
-                      final offset = renderBox!.localToGlobal(Offset.zero);
-                      onDateTap?.call(
-                          DateTime(
-                            date.year,
-                            date.month,
-                            date.day,
-                            0,
-                            minuteSlotSize.minutes * row,
+                child: CompositedTransformTarget(
+                  link: _layersLinks[row][col],
+                  child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: () {
+                        final renderBox = context.findRenderObject() as RenderBox?;
+                        final offset = renderBox!.localToGlobal(Offset.zero);
+                        onDateTap?.call(
+                            DateTime(
+                              date.year,
+                              date.month,
+                              date.day,
+                              0,
+                              minuteSlotSize.minutes * row,
+                            ),
+                            col,
+                            ((heightPerSlot * row) + offset.dy) % (renderBox.size.height + offset.dy), // top
+                            col * columnSize + 71, // left
+                            columnSize, // width
+                            heightPerSlot, // height
+                            _layersLinks[row][col]
+                            );
+                        /*_showOverlay(
+                            context,
+                            heightPerSlot * row,
+                            col * columnSize,
+                            width: columnSize);*/
+                      },
+                      onLongPress: () => onDateLongPress?.call(
+                            DateTime(
+                              date.year,
+                              date.month,
+                              date.day,
+                              0,
+                              minuteSlotSize.minutes * row,
+                            ),
                           ),
-                          col,
-                          ((heightPerSlot * row) + offset.dy) %
-                              (renderBox.size.height + offset.dy), // top
-                          col * columnSize + 71, // left
-                          columnSize, // width
-                          heightPerSlot // height
-                      );
-                      /*_showOverlay(
-                          context,
-                          heightPerSlot * row,
-                          col * columnSize,
-                          width: columnSize);*/
-                    },
-                    onLongPress: () =>
-                        onDateLongPress?.call(
-                          DateTime(
-                            date.year,
-                            date.month,
-                            date.day,
-                            0,
-                            minuteSlotSize.minutes * row,
-                          ),
-                        ),
-                    child: cellBuilder?.call(columnSize, height, row, col) ??
-                        SizedBox(
-                          width: width,
-                          height: heightPerSlot,
-                        )),
+                      child: cellBuilder?.call(columnSize, height, row, col) ??
+                          SizedBox(
+                            width: width,
+                            height: heightPerSlot,
+                          )),
+                ),
               ),
         ],
       ),

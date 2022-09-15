@@ -50,12 +50,12 @@ typedef TileTapCallback<T extends Object?> = void Function(
 
 typedef CellTapCallback<T extends Object?> = void Function(
     List<CalendarEventData<T>> events, DateTime date,
-    double top, double left, double width, double height);
+    double top, double left, double width, double height, LayerLink layerLink);
 
 typedef DatePressCallback = void Function(DateTime date);
 
 typedef DateTapCallback = void Function(DateTime date, int column,
-    double top, double left, double width, double height);
+    double top, double left, double width, double height, LayerLink layerLink);
 
 typedef EventFilter<T extends Object?> = List<CalendarEventData<T>> Function(
     DateTime date, List<CalendarEventData<T>> events);
